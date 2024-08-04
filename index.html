@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagon Animation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.2/gsap.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .hexagon {
+            position: absolute;
+            stroke: black;
+            stroke-width: 17px;
+            fill: none;
+        }
+        .circle {
+            stroke: black;
+            stroke-width: 16px;
+            fill: white;
+        }
+        .line {
+            stroke: black;
+            stroke-width: 16px;
+        }
+        text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 90px;
+            font-weight: 600;
+            text-anchor: middle;
+        }
+        svg {
+            width: 700px;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <svg viewBox="0 0 700 600">
+        <polygon id="outerHex" class="hexagon" points=""/>
+        <polygon id="innerHex" class="hexagon" points=""/>
+        <line id="line1" class="line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line2" class="line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line3" class="line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line4" class="line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line5" class="line" x1="0" y1="0" x2="0" y2="0"/>
+        <line id="line6" class="line" x1="0" y1="0" x2="0" y2="0"/>
+        <circle id="circle1" class="circle" r="25"/>
+        <circle id="circle2" class="circle" r="25"/>
+        <circle id="circle3" class="circle" r="25"/>
+        <circle id="circle4" class="circle" r="25"/>
+        <circle id="circle5" class="circle" r="25"/>
+        <circle id="circle6" class="circle" r="25"/>
+        <text id="logoText" x="350" y="570">INNOVISION IA</text>
+    </svg>
+    <script>
+        function createHexagon(size, centerX, centerY, rotation = 0) {
+            const points = [];
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i + rotation;
+                const x = centerX + size * Math.cos(angle);
+                const y = centerY + size * Math.sin(angle);
+                points.push({x, y});
+            }
+            return points;
+        }
+
+        const outerHex = document.getElementById('outerHex');
+        const innerHex = document.getElementById('innerHex');
+
+        const centerX = 350;
+        const centerY = 300;
+        const outerHexSize = 150;
+        const innerHexSize = 50;
+        const rotationOffset = Math.PI / 2; // 90 grados en radianes
+
+        const outerHexPoints = createHexagon(outerHexSize, centerX, centerY, rotationOffset);
+        outerHex.setAttribute('points', outerHexPoints.map(p => `${p.x},${p.y}`).join(" "));
+
+        const innerHexPoints = createHexagon(innerHexSize, centerX, centerY, rotationOffset);
+        innerHex.setAttribute('points', innerHexPoints.map(p => `${p.x},${p.y}`).join(" "));
+
+        function addCirclesAndLines() {
+            const offset = 40; // Distancia desde el centro para las líneas
+            for (let i = 0; i < 6; i++) {
+                const angle = (Math.PI / 3) * i + rotationOffset;
+                const lineStartX = centerX + offset * Math.cos(angle);
+                const lineStartY = centerY + offset * Math.sin(angle);
+
+                const circle = document.getElementById(`circle${i + 1}`);
+                circle.setAttribute('cx', outerHexPoints[i].x);
+                circle.setAttribute('cy', outerHexPoints[i].y);
+
+                const line = document.getElementById(`line${i + 1}`);
+                line.setAttribute('x1', lineStartX);
+                line.setAttribute('y1', lineStartY);
+                line.setAttribute('x2', outerHexPoints[i].x);
+                line.setAttribute('y2', outerHexPoints[i].y);
+            }
+        }
+
+        addCirclesAndLines();
+
+        // GSAP Animations
+        gsap.fromTo("#outerHex", { rotation: 0, transformOrigin: "center" }, { rotation: 360, duration: 10, repeat: -1, ease: "linear" });
+        gsap.fromTo("#innerHex", { scale: 0, transformOrigin: "center" }, { scale: 1, duration: 2, repeat: -1, yoyo: true, ease: "elastic" });
+        gsap.fromTo(".circle", { scale: 0, transformOrigin: "center" }, { scale: 1, duration: 1, stagger: 0.2, repeat: -1, yoyo: true, ease: "bounce" });
+        gsap.fromTo(".line", { drawSVG: "1%" }, { drawSVG: "100%", duration: 2, stagger: 0.2, repeat: -1, yoyo: true, ease: "power2.inOut" });
+        gsap.fromTo("#logoText", { opacity: 0 }, { opacity: 1, duration: 2, repeat: 0, yoyo: true, ease: "power2.inOut" });
+    </script>
+</body>
+</html>
